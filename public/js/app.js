@@ -1,10 +1,12 @@
-var hypr = angular.module('hypr', ['google-maps']);
+var hypr = angular.module('hypr', ['google-maps', 'btford.socket-io']);
 
+hypr.factory('socket', function(socketFactory) {
+  return socketFactory();
+});
 
-hypr.controller('HyprCtrl', function($scope) {
+hypr.controller('HyprCtrl', function($scope, socket) {
   // default the scope lat and long
-  $scope.lat = "0";
-  $scope.lng = "0";
+  $scope.userLocation = {latitude: 0, longitude: 0};
   $scope.markers = [];
 
   // get user geolocation - yay html5
@@ -31,33 +33,69 @@ hypr.controller('HyprCtrl', function($scope) {
       longitude: position.coords.longitude
     };
 
-
+    $scope.userLocation = {latitude: position.coords.latitude, longitude: position.coords.longitude};
     $scope.$apply();
   };
 
   // map style
 
-  $scope.map.style = styleArray = [
-  {
-    featureType: "all",
-    stylers: [
-      { saturation: -80 }
-    ]
-  },{
-    featureType: "road.arterial",
-    // elementType: "geometry",
-    stylers: [
-      { hue: "#00ffee" },
-      { saturation: 50 }
-    ]
-  },{
-    featureType: "poi.business",
-    elementType: "labels",
-    stylers: [
-      { visibility: "off" }
-    ]
-  }
-];
+  var style = styleArray = [
+    {
+      featureType: "all",
+      stylers: [
+        {saturation: '-10'}
+      ]
+    },{
+      featureType: "road",
+      elementType: "labels.text.fill",
+      stylers: [
+        {hue: "#898a90"}
+      ]
+    },{
+      featureType: "road",
+      elementType: "labels.text.stroke",
+      stylers: [
+        {hue: "#f4f4f4"}
+      ]
+    },{
+      featureType: "road",
+      elementType: "geometry",
+      stylers: [
+        {visibility: "on"},
+        { color: "#f4f4f4" }
+        
+      ]
+    },{
+      featureType: "landscape",
+      elementType: "geometry",
+      stylers: [
+        {color: "#898a90"}
+       
+      ]
+    },{
+      featureType: "landscape.manmade",
+      elementType: "geometry.fill",
+      stylers: [
+        {color: "#898a90"}
+      ]
+    },{
+      featureType: "water",
+      elementType: "labels",
+      stylers: [
+        {visibility: "off"}
+      ]
+    },{
+      featureType: "water",
+      stylers: [
+        { color: "#4c4c4c" }
+      ]
+    },{
+      featureType: "transit",
+      stylers: [
+        {visibility: "off"}
+      ]
+    }
+  ];
 
 
   // set up the map parts of the scope
@@ -67,21 +105,28 @@ hypr.controller('HyprCtrl', function($scope) {
       latitude: 39.951715199999995,
       longitude: -75.1915001
     },
-    zoom: 12,
+    zoom: 14,
     // custom google maps options
     options: {
       // disable a shit ton of map features
-      zoomControl: false,
+      zoomControl: true,
       // minZoom *should* be redundant but I'd rather not let them zoom out to the world view
-      minZoom: 11,
-      scrollwheel: false,
+      minZoom: 12,
+      scrollwheel: true,
       panControl: false,
       rotateControl: false,
       scaleControl: false,
-      streetViewControl: false
+      streetViewControl: false,
+      styles: style
     }
   };
 
+  // WEBSOCKETS HOLLER BACK
+
+  socket.forward('data', $scope);
+  $scope.$on('socket:data', function(ev, data){
+    $scope.markers = data;
+  });
 
 
 });

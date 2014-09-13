@@ -9,8 +9,8 @@
 </head>
 <body ng-app="hypr">
   <div ng-controller="HyprCtrl">
-    <google-map center="map.center" zoom="map.zoom" draggable="false" options="map.options">
-      <marker idKey="1" coords="map.center"></marker>
+    <google-map center="map.center" zoom="map.zoom" draggable="true" options="map.options">
+      <marker idKey="1" coords="userLocation"></marker>
     </google-map>
   </div>
   <!-- Scripts -->
@@ -20,6 +20,8 @@
     <script src='//maps.googleapis.com/maps/api/js?sensor=false'></script>
     <script src="bower_components/lodash/dist/lodash.underscore.min.js"></script>
     <script src="bower_components/angular-google-maps/dist/angular-google-maps.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="bower_components/angular-socket-io/socket.min.js"></script>
   <!-- // Scripts -->
 </body>
 </html>
