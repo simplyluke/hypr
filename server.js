@@ -18,7 +18,7 @@ socketio.on("connection", function(socket)
 	{
 		// uhhhh let's just trust them for now.
 		// better auth to come.
-		socket.uid = data;
+		socket.uid = uid;
 		socket.auth = true;
 
 		// search in radius of user
@@ -26,6 +26,8 @@ socketio.on("connection", function(socket)
 		// concatenate into variable events
 
 		socket.emit("update-all", events);
+
+		console.log("Authed client: " + socket.uid);
 	});
 
 	socket.on("create", function(roomData)
@@ -34,17 +36,24 @@ socketio.on("connection", function(socket)
 
 		// where is room ID going to come from?
 		socket.join(roomData.id);
+
+		console.log("Created room: " + roomData.id);
 	});
 
 	socket.on("join", function(room)
 	{
 		// that was easy
 		socket.join(room);
+
+		console.log("Joined room: " + room);
 	});
 
 	socket.on("leave", function(room)
 	{
+		// that was also easy
 		socket.leave(room);
+
+		console.log("Left room: " + room);
 	});
 
 	socket.on("disconnect", function()
