@@ -17,17 +17,6 @@ mongoose.connect("mongodb://localhost/hypr", function()
 	console.log("Started DB service");
 });
 
-mongoose.connection.on("open", function(ref)
-{
-	console.log("Connected to DB.");
-});
-
-mongoose.connection.on("error", function(err)
-{
-	console.log("Failed to connect to database: " + err);
-	process.exit();
-});
-
 var eventSchema = mongoose.Schema({
 	title: String,
 	latitude: Number,
@@ -105,6 +94,7 @@ io.on("connection", function(socket)
 
 		var newEvent = new Event(
 		{
+			title: eventData.title,
 			latitude: eventData.latitude,
 			longitude: eventData.longitude,
 			fstag: "",
