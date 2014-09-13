@@ -1,0 +1,55 @@
+<html>
+<head>
+	<title>Hypr socket backend tester</title>
+	<script src="https://cdn.socket.io/socket.io-1.0.0.js"></script>
+	<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script>
+		var socket = io();
+		$(function() {
+			$("input").on("keypress", function(e)
+			{
+				var code = e.keyCode || e.which;
+ 				if(code == 13)
+ 				{
+					e.preventDefault();
+					var action = $(this).attr("id");
+					var data;
+					switch(action)
+					{
+						case "auth":
+							data = $("#auth").val();
+							break;
+						case "create":
+							//
+							break;
+						case "join":
+							data = $("#join").val();
+							break;
+						case "leave":
+							data = $("#leave").val();
+							break;
+						default:
+							alert("You haven't implemented this yet!");
+					} 					
+					socket.emit(action, data);
+				}
+			});
+		});
+	</script>
+</head>
+<body>
+<form>
+	<label for="auth">Auth as ID:</label>
+	<input name="auth" id="auth" type="text" />
+	<br />
+	<label for="create">Create room:</label>
+	<input name="create" id="create" type="text"/>
+	<br />
+	<label for="join">Join room:</label>
+	<input name="join" id="join" type="text" />
+	<br />
+	<label for="leave">Leave room:</label>
+	<input name="leave" id="leave" type="text" />
+</form>
+</body>
+</html>

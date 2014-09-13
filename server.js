@@ -1,16 +1,22 @@
 var express = require("express");
 var app = express();
 var http = require("http");
-var socketio = require("socket.io")(http);
 var mongoose = require("mongoose");
 var pjson = require("./package.json");
 var path = require("path");
+
+var server = http.createServer(app).listen(3000, function()
+{
+	console.log("HTTP server listening.");
+});
+
+var io = require("socket.io").listen(server);
 
 console.log("Hypr backend version " + pjson.version);
 
 app.use(express.static(path.join(__dirname,"public")));
 
-socketio.on("connection", function(socket)
+io.on("connection", function(socket)
 {
 	console.log("Client connected.");
 
@@ -18,7 +24,7 @@ socketio.on("connection", function(socket)
 	{
 		// uhhhh let's just trust them for now.
 		// better auth to come.
-		socket.uid = data;
+		socket.uid = uid;
 		socket.auth = true;
 
 		// search in radius of user
@@ -26,6 +32,8 @@ socketio.on("connection", function(socket)
 		// concatenate into variable events
 
 		socket.emit("update-all", events);
+
+		console.log("Authed client: " + socket.uid);
 	});
 
 	socket.on("create", function(roomData)
@@ -34,26 +42,28 @@ socketio.on("connection", function(socket)
 
 		// where is room ID going to come from?
 		socket.join(roomData.id);
+
+		console.log("Created room: " + roomData.id);
 	});
 
 	socket.on("join", function(room)
 	{
 		// that was easy
 		socket.join(room);
+
+		console.log("Joined room: " + room);
 	});
 
 	socket.on("leave", function(room)
 	{
+		// that was also easy
 		socket.leave(room);
+
+		console.log("Left room: " + room);
 	});
 
 	socket.on("disconnect", function()
 	{
 		console.log("Client disconnected.");
 	});
-});
-
-app.listen(8080, function()
-{
-	console.log("HTTP server started.");
 });
