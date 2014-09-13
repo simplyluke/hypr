@@ -1,0 +1,17 @@
+{
+  "name": "hypr",
+  "version": "1.0.0",
+  "description": "Backend for the Hypr app, created for PennApps X.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.9.0",
+    "mongoose": "^3.8.16",
+    "socket.io": "^1.1.0"
+  }
+}
