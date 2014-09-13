@@ -1,16 +1,22 @@
 var express = require("express");
 var app = express();
 var http = require("http");
-var socketio = require("socket.io")(http);
 var mongoose = require("mongoose");
 var pjson = require("./package.json");
 var path = require("path");
+
+var server = http.createServer(app).listen(3000, function()
+{
+	console.log("HTTP server listening.");
+});
+
+var io = require("socket.io").listen(server);
 
 console.log("Hypr backend version " + pjson.version);
 
 app.use(express.static(path.join(__dirname,"public")));
 
-socketio.on("connection", function(socket)
+io.on("connection", function(socket)
 {
 	console.log("Client connected.");
 
@@ -60,9 +66,4 @@ socketio.on("connection", function(socket)
 	{
 		console.log("Client disconnected.");
 	});
-});
-
-app.listen(8080, function()
-{
-	console.log("HTTP server started.");
 });
