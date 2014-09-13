@@ -49,6 +49,11 @@
 			{
 				console.log("User joined: " + JSON.stringify(data));
 			});
+
+			socket.on("err", function(data)
+			{
+				console.log("ERROR: " + data);
+			});
 		});
 	</script>
 </head>
