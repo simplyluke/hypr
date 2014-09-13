@@ -14,7 +14,18 @@ var io = require("socket.io").listen(server);
 
 mongoose.connect("mongodb://localhost/hypr", function()
 {
-	console.log("Connected to DB");
+	console.log("Started DB service");
+});
+
+mongoose.connection.on("open", function(ref)
+{
+	console.log("Connected to DB.");
+});
+
+mongoose.connection.on("error", function(err)
+{
+	console.log("Failed to connect to database: " + err);
+	process.exit();
 });
 
 var eventSchema = mongoose.Schema({
