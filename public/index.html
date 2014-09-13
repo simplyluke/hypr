@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="hypr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>hypr</title>
@@ -7,10 +7,18 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <style>[ng-cloak] {display: none;}</style>
 </head>
-<body>
-  <google-map></google-map>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
-  <script src="/app.js"></script>
+<body ng-app="hypr">
+  <script type="text/ng-template" id="todomvc-index.html">
+
+    <google-map center="map.center" zoom="map.zoom"></google-map>
+  </script>
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/angular-route/angular-route.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/controllers/hyprCtrl.js"></script>
+  <script src='//maps.googleapis.com/maps/api/js?sensor=false'></script>
+  <script src="bower_components/lodash/dist/lodash.underscore.min.js"></script>
+  <script src="bower_components/angular-google-maps/dist/angular-google-maps.min.js"></script>
 </body>
 </html>
