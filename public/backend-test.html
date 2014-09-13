@@ -4,8 +4,8 @@
 	<script src="https://cdn.socket.io/socket.io-1.0.0.js"></script>
 	<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 	<script>
-		var socket = io();
 		$(function() {
+			var socket = io();
 			$("input").on("keypress", function(e)
 			{
 				var code = e.keyCode || e.which;
@@ -20,7 +20,7 @@
 							data = $("#auth").val();
 							break;
 						case "create":
-							//
+							data = $.parseJSON($("#create").val());
 							break;
 						case "join":
 							data = $("#join").val();
@@ -30,9 +30,14 @@
 							break;
 						default:
 							alert("You haven't implemented this yet!");
-					} 					
+					}
 					socket.emit(action, data);
 				}
+			});
+
+			socket.on("update-all", function(data)
+			{
+				console.log("Update-All received: " + data);
 			});
 		});
 	</script>
