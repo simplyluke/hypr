@@ -9,6 +9,7 @@ var server = http.createServer(app).listen(3000, function()
 {
 	console.log("HTTP server listening.");
 });
+
 var io = require("socket.io").listen(server);
 
 mongoose.connect("mongodb://localhost/hypr", function()
@@ -34,17 +35,13 @@ console.log("Hypr backend version " + pjson.version);
 
 io.on("connection", function(socket)
 {
-	console.log("Client connected.");
+	console.log("New client connected.");
 
 	socket.on("auth", function(uid)
 	{
 		// uhhhh let's just trust them for now.
 		// better auth to come.
 		socket.uid = uid;
-		
-		// search in radius of user
-		// gather event data
-		// concatenate into variable events
 
 		var Event = mongoose.model("Event", eventSchema);
 		var allEvents = [];
@@ -53,14 +50,16 @@ io.on("connection", function(socket)
 			if(err)
 			{
 				console.log("001 Database error: " + err);
+				socket.emit("error", "Error 001: Could not read from database. Please try again later.");
+				return;
 			}
 
 			events.forEach(function(e)
 			{
-				console.log("Event retrieved: " + e);
 				allEvents.push(e);
 			});
 
+			// update-all to the user that just logged in
 			socket.emit("update-all", allEvents);
 			
 			console.log("Authed client: " + socket.uid);
@@ -72,6 +71,7 @@ io.on("connection", function(socket)
 		if(typeof socket.uid === "undefined")
 		{
 			console.log("User not authenticated, unable to create event.");
+			socket.emit("error", "You are not logged in!");
 			return;
 		}
 
@@ -89,31 +89,31 @@ io.on("connection", function(socket)
 			attendees: []
 		});
 
-		var eid;
-
 		newEvent.save(function(err, result, nAff)
 		{
 			if(err)
 			{
 				console.log("002 Error saving document: " + err);
+				socket.emit("error", "Error 002: Could not connect to database. Please try again later.");
+				return;
 			}
 
-			// joining the room should create it
-			// where is room ID going to come from?
 			socket.join(result.id);
 
-			//console.log(eventData);
+			// tell EVERYONE that this was created.
+			io.emit("update", result);
 
-			console.log("Created room: " + result.id);
+			console.log(socket.uid + " created room: " + result.id + " (" + result.title + ")");
 		});
-
 	});
 
 	socket.on("join", function(eventID)
 	{
 		if(typeof socket.uid === "undefined")
 		{
-			console.log("User not authenticated, unable to join room.");
+			console.log("User not authenticated, unable to join event.");
+			socket.emit("error", "You are not logged in!");
+			return;
 		}
 
 		var Event = mongoose.model("Event", eventSchema);
@@ -123,18 +123,22 @@ io.on("connection", function(socket)
 			if(err)
 			{
 				console.log("003 Error reading database: " + err);
+				socket.emit("error", "Error 003: Could not connect to database.");
 				return;
 			}
 
 			if(!result)
 			{
 				console.log("004 Event does not exist.");
+				socket.emit("error", "This event does not exist!");
 				return;
 			}
 
 			result.attendees.push(socket.uid);
 
+			socket.to(result.id).emit("bcast-join", socket.uid);
 			socket.join(result.id);
+
 
 			console.log("User " + socket.uid + " joined event " + result.id + " (" + result.title + ")");
 
@@ -143,6 +147,7 @@ io.on("connection", function(socket)
 				if(err)
 				{
 					console.log("005 Could not save updated event.");
+					socket.emit("error", "Error 005: Could not write to database. Please try again later.");
 					return;
 				}
 
@@ -157,6 +162,7 @@ io.on("connection", function(socket)
 		if(typeof socket.uid === "undefined")
 		{
 			console.log("User not authenticated, unable to leave event.");
+			socket.emit("error", "You are not logged in!");
 			return;
 		}
 
@@ -167,12 +173,14 @@ io.on("connection", function(socket)
 			if(err)
 			{
 				console.log("006 Error reading database: " + err);
+				socket.emit("error", "Error 006: Could not read from database. Please try again later.");
 				return;
 			}
 
 			if(!result)
 			{
 				console.log("007 Event not found");
+				socket.emit("error", "This event does not exist!");
 				return;
 			}
 
@@ -181,6 +189,7 @@ io.on("connection", function(socket)
 			if(attendeeIndex == -1)
 			{
 				console.log("008 Client is not attending this event!");
+				socket.emit("error", "You were not attending this event.");
 				return;
 			}
 
@@ -196,13 +205,22 @@ io.on("connection", function(socket)
 		});
 	});
 
+	/*
 	socket.on("message", function(messageData)
 	{
 
 	});
+	*/
 
 	socket.on("disconnect", function()
 	{
-		console.log("Client disconnected.");
+		if(typeof socket.uid === "undefined")
+		{
+			console.log("Unauthenticated user disconnected.");	
+		}
+		else
+		{
+			console.log(socket.uid + " disconnected.");
+		}
 	});
 });

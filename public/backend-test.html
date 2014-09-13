@@ -37,7 +37,17 @@
 
 			socket.on("update-all", function(data)
 			{
-				console.log("Update-All received: " + data);
+				console.log("Received all-events update: " + JSON.stringify(data));
+			});
+
+			socket.on("update", function(data)
+			{
+				console.log("Received individual event update: " + JSON.stringify(data));
+			});
+
+			socket.on("bcast-join", function(data)
+			{
+				console.log("User joined: " + JSON.stringify(data));
 			});
 		});
 	</script>
