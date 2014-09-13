@@ -2,6 +2,7 @@ var hypr = angular.module('hypr', ['google-maps', 'btford.socket-io']);
 
 hypr.factory('socket', function(socketFactory) {
   var socket = io.connect();
+  console.log(socket);
   return {
     on: function (eventName, callback) {
       socket.on(eventName, function(){
@@ -12,6 +13,7 @@ hypr.factory('socket', function(socketFactory) {
       });
     },
     emit: function (eventName, data, callback) {
+      console.log('calling' + eventName);
       socket.emit(eventName, data, function () {
         var args = arguments;
         $rootScope.$apply(function () {
@@ -142,15 +144,18 @@ hypr.controller('HyprCtrl', function($scope, socket) {
 
   // WEBSOCKETS HOLLER BACK
 
+  var authSocket = function(socket)
+  {
+    socket.emit('auth', 'web');
+  }
+  authSocket(socket);
 
-  // socket.on("connection", function(){
-  //   console.log("connected!");
-  // });
+  socket.on('update-all', function(data)
+  {
+    console.log(JSON.stringify(data));    
+  });
 
-  // socket.forward('data', $scope);
-  // $scope.$on('socket:data', function(ev, data){
-  //   $scope.markers = data;
-  // });
+
 
 
 });
