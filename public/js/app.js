@@ -1,9 +1,28 @@
 var hypr = angular.module('hypr', ['google-maps', 'btford.socket-io']);
 
 hypr.factory('socket', function(socketFactory) {
-  return socketFactory();
+  var socket = io.connect();
+  return {
+    on: function (eventName, callback) {
+      socket.on(eventName, function(){
+        var args = arguments;
+        $rootScope.$apply(function() {
+          callback.apply(socket, args);
+        });
+      });
+    },
+    emit: function (eventName, data, callback) {
+      socket.emit(eventName, data, function () {
+        var args = arguments;
+        $rootScope.$apply(function () {
+          if (callback) {
+            callback.apply(socket, args);
+          }
+        });
+      });
+    }
+  };
 });
-
 hypr.controller('HyprCtrl', function($scope, socket) {
   // default the scope lat and long
   $scope.userLocation = {latitude: 0, longitude: 0};
@@ -123,10 +142,15 @@ hypr.controller('HyprCtrl', function($scope, socket) {
 
   // WEBSOCKETS HOLLER BACK
 
-  socket.forward('data', $scope);
-  $scope.$on('socket:data', function(ev, data){
-    $scope.markers = data;
-  });
+
+  // socket.on("connection", function(){
+  //   console.log("connected!");
+  // });
+
+  // socket.forward('data', $scope);
+  // $scope.$on('socket:data', function(ev, data){
+  //   $scope.markers = data;
+  // });
 
 
 });
