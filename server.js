@@ -140,7 +140,7 @@ io.on("connection", function(socket)
 
 		var Event = databae.model("Event", eventSchema);
 
-		Event.findOne({_id: eventID}, function(err, result)
+		Event.findOne({eid: eventID}, function(err, result)
 		{
 			if(err)
 			{
@@ -190,7 +190,7 @@ io.on("connection", function(socket)
 
 		var Event = databae.model("Event", eventSchema);
 
-		Event.findOne({_id: eventID}, function(err, result)
+		Event.findOne({eid: eventID}, function(err, result)
 		{
 			if(err)
 			{
