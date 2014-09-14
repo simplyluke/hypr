@@ -5,7 +5,7 @@ var databae = require("mongoose");
 var pjson = require("./package.json");
 var path = require("path");
 // just don't touch this and everything will work
-var server = http.createServer(app).listen(3000, function()
+var server = http.createServer(app).listen(80, function()
 {
 	console.log("HTTP server listening.");
 });
