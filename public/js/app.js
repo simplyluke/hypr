@@ -1,6 +1,6 @@
 var hypr = angular.module('hypr', ['google-maps', 'btford.socket-io']);
 
-hypr.factory('socket', function(socketFactory) {
+hypr.factory('socket', function($rootScope, socketFactory) {
   var socket = io.connect();
   console.log(socket);
   return {
@@ -25,10 +25,10 @@ hypr.factory('socket', function(socketFactory) {
     }
   };
 });
-hypr.controller('HyprCtrl', function($scope, socket) {
+hypr.controller('HyprCtrl', function($rootScope, $scope, socket) {
   // default the scope lat and long
   $scope.userLocation = {latitude: 0, longitude: 0};
-  $scope.markers = [];
+  $scope.markers;
 
   // get user geolocation - yay html5
   $scope.getLocation = function () {
@@ -144,15 +144,19 @@ hypr.controller('HyprCtrl', function($scope, socket) {
 
   // WEBSOCKETS HOLLER BACK
 
-  var authSocket = function(socket)
-  {
-    socket.emit('auth', 'web');
-  }
+  // "auth" with the server
+  var authSocket = function(socket){ socket.emit('auth', 'web')};
   authSocket(socket);
 
-  socket.on('update-all', function(data)
-  {
-    console.log(JSON.stringify(data));    
+  // retrieves the entire list of events
+  socket.on('update-all', function(data){
+    $scope.markers = data;
+    console.log('updated $scope.markers w/ new list')
+  });
+
+  socket.on('update', function(data) {
+    $scope.markers = $scope.markers.concat(data);
+    console.log('updated $scope.markers w/ one new object');
   });
 
 

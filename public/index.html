@@ -11,6 +11,7 @@
   <div ng-controller="HyprCtrl">
     <google-map center="map.center" zoom="map.zoom" draggable="true" options="map.options">
       <marker idKey="1" coords="userLocation"></marker>
+      <markers models="markers" coords="'self'" idKey="'_id'"></markers>
     </google-map>
   </div>
   <!-- Scripts -->
