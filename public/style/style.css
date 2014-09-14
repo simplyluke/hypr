@@ -11,10 +11,10 @@ html {
   width: 80%;
 }
 
-.right {
+.left {
   positon: fixed;
   top: 0;
-  right: 0px;
+  left: 0px;
   display: block;
   height: 99%;
   width: 20%;
@@ -22,18 +22,18 @@ html {
 
 }
 
-.right > img {
+.left > img {
   max-width: 90%;
   position: relative;
   display: block;
   margin: 0 auto;
 }
 
-.right > h2 {text-align: center;}
+.left > h2 {text-align: center;}
 
 .recentEventsList {
   list-style: none;
-  padding-left: 0px;
+  padding-right: 0px;
   max-height: 400px;
   overflow-y: scroll;
 }
@@ -43,4 +43,9 @@ html {
   padding: 3px 5%;
   border-bottom: 1px solid #eee;
   width: 100%;
+}
+
+.bottom {
+  positon: absolute;
+  bottom: 0;
 }
