@@ -1,23 +1,28 @@
 var express = require("express");
 var app = express();
 var http = require("http");
-var mongoose = require("mongoose");
+var databae = require("mongoose");
 var pjson = require("./package.json");
 var path = require("path");
 // just don't touch this and everything will work
-var server = http.createServer(app).listen(3000, function()
+if(typeof process.env.PORT === "undefined")
+{
+	process.env.PORT = 3000;
+}
+var server = http.createServer(app).listen(process.env.PORT, function()
 {
 	console.log("HTTP server listening.");
 });
 
 var io = require("socket.io").listen(server);
 
-mongoose.connect("mongodb://localhost/hypr", function()
+databae.connect("mongodb://localhost/hypr", function()
 {
 	console.log("Started DB service");
 });
 
-var eventSchema = mongoose.Schema({
+var eventSchema = databae.Schema({
+	eid: String,
 	title: String,
 	latitude: Number,
 	longitude: Number,
@@ -26,6 +31,7 @@ var eventSchema = mongoose.Schema({
 	description: String,
 	timestamp: Number,
 	creator: String,
+	capacity: Number,
 	attendees: [String]
 });
 
@@ -57,7 +63,7 @@ io.on("connection", function(socket)
 
 		socket.uid = uid;
 
-		var Event = mongoose.model("Event", eventSchema);
+		var Event = databae.model("Event", eventSchema);
 		var allEvents = [];
 		Event.find({}, function(err, events)
 		{
@@ -90,17 +96,19 @@ io.on("connection", function(socket)
 		}
 
 		// need to validate data
-		var Event = mongoose.model("Event", eventSchema);
+		var Event = databae.model("Event", eventSchema);
 
 		var newEvent = new Event(
 		{
 			title: eventData.title,
+			eid: eventData.eid,
 			latitude: eventData.latitude,
 			longitude: eventData.longitude,
 			fstag: "",
 			description: eventData.description,
 			timestamp: Date.now(),
 			creator: socket.uid,
+			capacity: eventData.capacity,
 			attendees: []
 		});
 
@@ -113,12 +121,12 @@ io.on("connection", function(socket)
 				return;
 			}
 
-			socket.join(result.id);
+			socket.join(result.eid);
 
 			// tell EVERYONE that this was created.
 			io.emit("update", result);
 
-			console.log(socket.uid + " created room: " + result.id + " (" + result.title + ")");
+			console.log(socket.uid + " created room: " + result.eid + " (" + result.title + ")");
 		});
 	});
 
@@ -131,9 +139,9 @@ io.on("connection", function(socket)
 			return;
 		}
 
-		var Event = mongoose.model("Event", eventSchema);
+		var Event = databae.model("Event", eventSchema);
 
-		Event.findOne({_id: eventID}, function(err, result)
+		Event.findOne({eid: eventID}, function(err, result)
 		{
 			if(err)
 			{
@@ -151,11 +159,11 @@ io.on("connection", function(socket)
 
 			result.attendees.push(socket.uid);
 
-			socket.to(result.id).emit("bcast-join", socket.uid);
-			socket.join(result.id);
+			socket.to(result.eid).emit("bcast-join", socket.uid);
+			socket.join(result.eid);
 
 
-			console.log("User " + socket.uid + " joined event " + result.id + " (" + result.title + ")");
+			console.log("User " + socket.uid + " joined event " + result.eid + " (" + result.title + ")");
 
 			result.save(function(err, e, nAffected)
 			{
@@ -166,7 +174,7 @@ io.on("connection", function(socket)
 					return;
 				}
 
-				console.log("Successfully updated event " + e.id);
+				console.log("Successfully updated event " + e.eid);
 			});
 		});
 
@@ -181,9 +189,9 @@ io.on("connection", function(socket)
 			return;
 		}
 
-		var Event = mongoose.model("Event", eventSchema);
+		var Event = databae.model("Event", eventSchema);
 
-		Event.findOne({_id: eventID}, function(err, result)
+		Event.findOne({eid: eventID}, function(err, result)
 		{
 			if(err)
 			{
@@ -199,7 +207,7 @@ io.on("connection", function(socket)
 				return;
 			}
 
-			var attendeeIndex = result.attendees.indexOf(result.id);
+			var attendeeIndex = result.attendees.indexOf(result.eid);
 
 			if(attendeeIndex == -1)
 			{
@@ -210,11 +218,11 @@ io.on("connection", function(socket)
 
 			result.attendees.splice(attendeeIndex ,1);
 
-			console.log("User " + socket.uid + " left room " + result.id + " (" + result.title + ")");
+			console.log("User " + socket.uid + " left room " + result.eid + " (" + result.title + ")");
 
 			result.save(function(err, e, nAffected)
 			{
-				socket.leave(e.id);
+				socket.leave(e.eid);
 			});
 
 		});
