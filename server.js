@@ -81,7 +81,7 @@ io.on("connection", function(socket)
 		});
 	});
 
-	socket.on("create", function(eventData)
+	socket.on("create", function(evIn)
 	{
 		if(typeof socket.uid === "undefined")
 		{
@@ -89,6 +89,9 @@ io.on("connection", function(socket)
 			socket.emit("err", "You are not logged in!");
 			return;
 		}
+
+		//evIn is a JSON in string form
+		eventData = JSON.parse(evIn);
 
 		// need to validate data
 		var Event = databae.model("Event", eventSchema);
