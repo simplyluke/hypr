@@ -1,8 +1,46 @@
 html {
   height: 100%;
+  width: 100%;
 }
 .angular-google-map-container { 
   position: absolute;
+  float: right;
+  right: 0;
+  top: 0;
   height: 100%; 
+  width: 80%;
+}
+
+.right {
+  positon: fixed;
+  top: 0;
+  right: 0px;
+  display: block;
+  height: 99%;
+  width: 20%;
+  padding: 10px;
+
+}
+
+.right > img {
+  max-width: 90%;
+  position: relative;
+  display: block;
+  margin: 0 auto;
+}
+
+.right > h2 {text-align: center;}
+
+.recentEventsList {
+  list-style: none;
+  padding-left: 0px;
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
+.recentEvent {
+  min-height: 30px;
+  padding: 3px 5%;
+  border-bottom: 1px solid #eee;
   width: 100%;
 }

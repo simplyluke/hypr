@@ -138,7 +138,10 @@ hypr.controller('HyprCtrl', function($rootScope, $scope, socket) {
       rotateControl: false,
       scaleControl: false,
       streetViewControl: false,
-      styles: style
+      styles: style,
+      zoomControlOptions: {
+        position: google.maps.ControlPosition.RIGHT_CENTER
+      }
     }
   };
 
@@ -151,7 +154,8 @@ hypr.controller('HyprCtrl', function($rootScope, $scope, socket) {
   // retrieves the entire list of events
   socket.on('update-all', function(data){
     $scope.markers = data;
-    console.log('updated $scope.markers w/ new list')
+    console.log('updated $scope.markers w/ new list');
+    console.log($scope.markers);
   });
 
   socket.on('update', function(data) {

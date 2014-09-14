@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="hypr">
 <head>
   <meta charset="UTF-8">
   <title>hypr</title>
@@ -7,13 +7,29 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <style>[ng-cloak] {display: none;}</style>
 </head>
-<body ng-app="hypr">
-  <div ng-controller="HyprCtrl">
-    <google-map center="map.center" zoom="map.zoom" draggable="true" options="map.options">
-      <marker idKey="1" coords="userLocation"></marker>
-      <markers models="markers" coords="'self'" idKey="'_id'"></markers>
-    </google-map>
+<body ng-controller="HyprCtrl">
+  <div class="right">
+    <img src="/images/logo.png" alt="">
+    <h2>Recent Events</h2>
+    <ul class="recentEventsList">
+      <li class="recentEvent" ng-repeat="marker in markers | orderBy: 'timestamp':true ">
+      <h4>{{marker.title}}</h4>
+      <p>{{marker.description}}</p>
+      <small>{{marker.timestamp | date : 'shortTime'}}</small>
+
+      </li>
+    </ul>
+    <div class="bottom">
+      
+    </div>
   </div>
+  <google-map center="map.center" zoom="map.zoom" draggable="true" options="map.options">
+    <marker idKey="1" coords="userLocation" options="location.options" icon="'images/circle.png'"></marker>
+    <!-- <markers models="markers" coords="'self'" idKey="'_id'" isLabel="true" options="{lableContent: self.description}"></markers> -->
+    <marker ng-repeat="marker in markers" coords="marker" idKey="'_id'">
+    </marker>
+  </google-map>
+  
   <!-- Scripts -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/angular/angular.min.js"></script>
