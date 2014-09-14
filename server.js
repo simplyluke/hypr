@@ -1,7 +1,7 @@
 var express = require("express");
 var app = express();
 var http = require("http");
-var mongoose = require("mongoose");
+var databae = require("mongoose");
 var pjson = require("./package.json");
 var path = require("path");
 // just don't touch this and everything will work
@@ -12,12 +12,12 @@ var server = http.createServer(app).listen(3000, function()
 
 var io = require("socket.io").listen(server);
 
-mongoose.connect("mongodb://localhost/hypr", function()
+databae.connect("mongodb://localhost/hypr", function()
 {
 	console.log("Started DB service");
 });
 
-var eventSchema = mongoose.Schema({
+var eventSchema = databae.Schema({
 	title: String,
 	latitude: Number,
 	longitude: Number,
@@ -26,6 +26,7 @@ var eventSchema = mongoose.Schema({
 	description: String,
 	timestamp: Number,
 	creator: String,
+	capacity: Number,
 	attendees: [String]
 });
 
@@ -57,7 +58,7 @@ io.on("connection", function(socket)
 
 		socket.uid = uid;
 
-		var Event = mongoose.model("Event", eventSchema);
+		var Event = databae.model("Event", eventSchema);
 		var allEvents = [];
 		Event.find({}, function(err, events)
 		{
@@ -90,7 +91,7 @@ io.on("connection", function(socket)
 		}
 
 		// need to validate data
-		var Event = mongoose.model("Event", eventSchema);
+		var Event = databae.model("Event", eventSchema);
 
 		var newEvent = new Event(
 		{
@@ -101,6 +102,7 @@ io.on("connection", function(socket)
 			description: eventData.description,
 			timestamp: Date.now(),
 			creator: socket.uid,
+			capacity: eventData.capacity,
 			attendees: []
 		});
 
@@ -131,7 +133,7 @@ io.on("connection", function(socket)
 			return;
 		}
 
-		var Event = mongoose.model("Event", eventSchema);
+		var Event = databae.model("Event", eventSchema);
 
 		Event.findOne({_id: eventID}, function(err, result)
 		{
@@ -181,7 +183,7 @@ io.on("connection", function(socket)
 			return;
 		}
 
-		var Event = mongoose.model("Event", eventSchema);
+		var Event = databae.model("Event", eventSchema);
 
 		Event.findOne({_id: eventID}, function(err, result)
 		{
