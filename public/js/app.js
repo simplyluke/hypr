@@ -152,10 +152,9 @@ hypr.controller('HyprCtrl', function($rootScope, $scope, socket) {
   authSocket(socket);
 
   // retrieves the entire list of events
-  socket.on('update-all', function(data){
+  socket.on('updateall', function(data){
     $scope.markers = data;
     console.log('updated $scope.markers w/ new list');
-    console.log($scope.markers);
   });
 
   socket.on('update', function(data) {
