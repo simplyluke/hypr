@@ -247,7 +247,7 @@ io.on("connection", function(socket)
 		}
 	});
 });
-
+/*
 setInterval(function()
 {
 	console.log("Auto-generating new event.");
@@ -291,3 +291,4 @@ setInterval(function()
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 }, 30 * 1000);
+*/
