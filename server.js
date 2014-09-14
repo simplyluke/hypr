@@ -80,7 +80,7 @@ io.on("connection", function(socket)
 			});
 
 			// update-all to the user that just logged in
-			socket.emit("update-all", allEvents);
+			socket.emit("updateall", allEvents);
 			
 			console.log("Authed client: " + socket.uid);
 		});
@@ -248,7 +248,7 @@ io.on("connection", function(socket)
 	});
 });
 
-setInterval(30 * 1000, function()
+setInterval(function()
 {
 	console.log("Auto-generating new event.");
 	var Event = databae.Model("Event", eventSchema);
@@ -290,4 +290,4 @@ setInterval(30 * 1000, function()
 	{
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
-});
+}, 30 * 1000);
