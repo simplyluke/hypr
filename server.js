@@ -5,6 +5,10 @@ var databae = require("mongoose");
 var pjson = require("./package.json");
 var path = require("path");
 // just don't touch this and everything will work
+if(typeof process.env.PORT === "undefined")
+{
+	process.env.PORT = 3000;
+}
 var server = http.createServer(app).listen(process.env.PORT, function()
 {
 	console.log("HTTP server listening.");
