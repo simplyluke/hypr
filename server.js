@@ -112,7 +112,7 @@ io.on("connection", function(socket)
 			attendees: []
 		});
 
-		newEvent.save(function(err, result, nAff)
+		newEvent.save(function(err, newEvent, nAff)
 		{
 			if(err)
 			{
@@ -121,12 +121,12 @@ io.on("connection", function(socket)
 				return;
 			}
 
-			socket.join(result.eid);
+			socket.join(newEvent.eid);
 
 			// tell EVERYONE that this was created.
-			io.emit("update", result);
+			io.emit("update", newEvent);
 
-			console.log(socket.uid + " created room: " + result.eid + " (" + result.title + ")");
+			console.log(socket.uid + " created room: " + newEvent.eid + " (" + newEvent.title + ")");
 		});
 	});
 
@@ -246,4 +246,48 @@ io.on("connection", function(socket)
 			console.log(socket.uid + " disconnected.");
 		}
 	});
+});
+
+setInterval(30 * 1000, function()
+{
+	console.log("Auto-generating new event.");
+	var Event = databae.Model("Event", eventSchema);
+
+
+	var evTitle;
+	switch(Math.random(getRandomInt(0,10)))
+	{
+		case 0:
+			evTitle = "6-hour layover. Who wants coffee?";
+			break;
+		case 1:
+			evTitle = "Need a team for trivia night";
+			break;
+		case 2:
+			evTitle = "Anyone down for ultimate frisbee?";
+			break;
+		case 3:
+			evTitle = "Who wants coffee?";
+			break;
+
+
+	}
+
+	var newEvent = Event({
+		title: eventData.title,
+		eid: eventData.eid,
+		latitude: eventData.latitude,
+		longitude: eventData.longitude,
+		fstag: "",
+		description: eventData.description,
+		timestamp: Date.now(),
+		creator: socket.uid,
+		capacity: eventData.capacity,
+		attendees: []		
+	});
+
+	function getRandomInt(min, max)
+	{
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
 });
