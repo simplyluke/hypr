@@ -18,6 +18,7 @@ databae.connect("mongodb://localhost/hypr", function()
 });
 
 var eventSchema = databae.Schema({
+	eid: String,
 	title: String,
 	latitude: Number,
 	longitude: Number,
@@ -99,6 +100,7 @@ io.on("connection", function(socket)
 		var newEvent = new Event(
 		{
 			title: eventData.title,
+			eid: eventData.eid,
 			latitude: eventData.latitude,
 			longitude: eventData.longitude,
 			fstag: "",
@@ -118,12 +120,12 @@ io.on("connection", function(socket)
 				return;
 			}
 
-			socket.join(result.id);
+			socket.join(result.eid);
 
 			// tell EVERYONE that this was created.
 			io.emit("update", result);
 
-			console.log(socket.uid + " created room: " + result.id + " (" + result.title + ")");
+			console.log(socket.uid + " created room: " + result.eid + " (" + result.title + ")");
 		});
 	});
 
@@ -156,11 +158,11 @@ io.on("connection", function(socket)
 
 			result.attendees.push(socket.uid);
 
-			socket.to(result.id).emit("bcast-join", socket.uid);
-			socket.join(result.id);
+			socket.to(result.eid).emit("bcast-join", socket.uid);
+			socket.join(result.eid);
 
 
-			console.log("User " + socket.uid + " joined event " + result.id + " (" + result.title + ")");
+			console.log("User " + socket.uid + " joined event " + result.eid + " (" + result.title + ")");
 
 			result.save(function(err, e, nAffected)
 			{
@@ -171,7 +173,7 @@ io.on("connection", function(socket)
 					return;
 				}
 
-				console.log("Successfully updated event " + e.id);
+				console.log("Successfully updated event " + e.eid);
 			});
 		});
 
@@ -204,7 +206,7 @@ io.on("connection", function(socket)
 				return;
 			}
 
-			var attendeeIndex = result.attendees.indexOf(result.id);
+			var attendeeIndex = result.attendees.indexOf(result.eid);
 
 			if(attendeeIndex == -1)
 			{
@@ -215,11 +217,11 @@ io.on("connection", function(socket)
 
 			result.attendees.splice(attendeeIndex ,1);
 
-			console.log("User " + socket.uid + " left room " + result.id + " (" + result.title + ")");
+			console.log("User " + socket.uid + " left room " + result.eid + " (" + result.title + ")");
 
 			result.save(function(err, e, nAffected)
 			{
-				socket.leave(e.id);
+				socket.leave(e.eid);
 			});
 
 		});
